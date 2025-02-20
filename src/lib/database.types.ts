@@ -15,6 +15,7 @@ export interface Database {
           amount: number
           description: string
           date: string
+          category: string
           user_id: string
           created_at: string
         }
@@ -23,6 +24,7 @@ export interface Database {
           amount: number
           description: string
           date: string
+          category: string
           user_id: string
           created_at?: string
         }
@@ -31,6 +33,7 @@ export interface Database {
           amount?: number
           description?: string
           date?: string
+          category?: string
           user_id?: string
           created_at?: string
         }

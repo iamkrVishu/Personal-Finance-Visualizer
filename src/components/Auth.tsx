@@ -29,13 +29,18 @@ export function Auth() {
         password,
       });
 
-      if (signUpError) throw signUpError;
-      setError('Account created successfully! You can now sign in.');
+      if (signUpError) {
+        if (signUpError.message === 'User already registered') {
+          throw new Error('An account with this email already exists. Please sign in instead.');
+        }
+        throw signUpError;
+      }
+      
+      setError('Account created successfully! Please check your email to confirm your account.');
       setEmail('');
       setPassword('');
     } catch (err: any) {
-      setError(err.error_description || err.message);
-      console.error('Error signing up:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
@@ -59,13 +64,12 @@ export function Auth() {
 
       if (signInError) {
         if (signInError.message === 'Invalid login credentials') {
-          throw new Error('Invalid email or password');
+          throw new Error('Invalid email or password. Please try again.');
         }
         throw signInError;
       }
     } catch (err: any) {
       setError(err.message);
-      console.error('Error signing in:', err);
     } finally {
       setLoading(false);
     }
@@ -81,9 +85,10 @@ export function Auth() {
             <input
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              onChange={(e) => setEmail(e.target.value.trim())}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"
               required
+              disabled={loading}
             />
           </div>
           <div>
@@ -92,13 +97,14 @@ export function Auth() {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 p-2 border"
               required
               minLength={6}
+              disabled={loading}
             />
           </div>
           {error && (
-            <div className="text-sm text-red-600">
+            <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
               {error}
             </div>
           )}
@@ -108,7 +114,7 @@ export function Auth() {
               disabled={loading}
               className="flex-1"
             >
-              Sign In
+              {loading ? 'Signing in...' : 'Sign In'}
             </Button>
             <Button
               onClick={handleSignUp}
@@ -117,7 +123,7 @@ export function Auth() {
               className="flex-1"
               type="button"
             >
-              Sign Up
+              {loading ? 'Creating account...' : 'Sign Up'}
             </Button>
           </div>
         </form>
